@@ -1,0 +1,22 @@
+Package: BiocHubQuery
+Type: Package
+Title: Functions to query Bioconductor AnnotationHub or ExperimentHub Remotely
+Version: 0.99.0
+Description: This package reads remote parquet files that are processed from Bioconductor Hub sqlite files. Users may query the tables directly for specific information or use pre-defined helper functions for common queries. This avoids downloading the full hub metadata sqlite file in order to query resources available.
+Depends: R (>= 4.6.0)
+Imports: arrow, dplyr
+License: Apache License (>= 2)
+Encoding: UTF-8
+RoxygenNote: 7.3.3
+Authors@R: c(
+    person(given="Lori", family="Shepherd", role = c("aut", "cre"), email = "lori.shepherd@roswellpark.org",comment=c(ORCID = "0000-0002-3242-0582")))    
+Suggests: 
+    BiocStyle,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+URL: https://github.com/lshep/BiocHubQuery.git
+BugReports: https://github.com/lshep/BiocHubQuery/issues
+biocViews: Software, Infrastructure
