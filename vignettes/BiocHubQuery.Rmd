@@ -1,0 +1,216 @@
+---
+title: "BiocHubQuery"
+author: "BiocHubs Team"
+format: html
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{BiocHubQuery}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 6,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+# Background
+
+AnnotationHub and ExperimentHub were developed within Bioconductor to facilitate
+the distribution of large annotation and experimental datasets without requiring
+those resources to be included directly in software packages. This approach
+helps avoid package bloat and keeps package sizes manageable while still
+providing access to substantial external resources.
+
+Traditionally, using the AnnotationHub or ExperimentHub packages requires
+downloading a SQLite database containing metadata describing all available
+resources before those resources can be searched or queried. As the number of
+available resources continues to grow, the size of this metadata database
+increases accordingly.
+
+BiocHubQuery provides an alternative approach. A separate data pipeline converts
+the AnnotationHub and ExperimentHub SQLite metadata tables into Parquet files
+that are hosted remotely. BiocHubQuery connects directly to these Parquet files,
+allowing users to query and filter metadata without first downloading the full
+SQLite database.
+
+# Installation and Loading
+
+`BiocHubQuery` is a _Bioconductor_ package and can be installed through
+`BiocManager::install()`.
+
+```{r, install, eval = FALSE}
+if (!"BiocManager" %in% rownames(installed.packages()))
+     install.packages("BiocManager")
+BiocManager::install("BiocHubQuery", dependencies=TRUE)
+```
+
+After the package is installed, it can be loaded into _R_ workspace by
+
+```{r, library, results='hide', warning=FALSE, message=FALSE}
+library(BiocHubQuery)
+```
+
+We will also load libraries need to run this vignette:
+
+```{r, setup}
+library(BiocHubQuery)
+library(dplyr)
+```
+
+# Available Tables
+
+The AnnotationHub and ExperimentHub databases share a common SQLite schema. In
+`BiocHubQuery`, each table in this schema has been converted into a Parquet file
+and made available for remote querying. In addition to the raw tables, a set of
+pre-computed views is also provided to simplify common join operations.
+
+## Existing SQLite Tables
+
+The following tables originate directly from the SQLite database and are
+available as Parquet files: resources, rdatapaths, location_prefixes,
+input_sources, statuses, and tags.
+
+#### resources
+
+The central table describing all available Hub resources. Each record
+corresponds to a single dataset or resource registered in AnnotationHub or
+ExperimentHub.
+
+Key fields include metadata such as:
+
+  - resource title and description
+  - species and genome information
+  - data provider and maintainer
+  - status and lifecycle information
+  - links to related tables via foreign keys
+
+#### rdatapaths
+
+Defines one or more R data object representations/files associated with each resource.
+
+This table includes:
+
+  - file paths for data objects
+  - R data classes (e.g., GRanges, SummarizedExperiment)
+  - dispatch information for object retrieval
+
+This table is typically used to determine how a resource should be loaded into
+R and combined with information in location_prefixes gives a complete download
+url of a file.
+
+**Note:** A single resource in the `resources` table may be associated with
+  multiple entries in the `rdatapaths` table. For example, a BAM resource will
+  have one entry in `resources`, while its associated files (e.g., BAM and BAI)
+  are represented as separate entries in `rdatapaths`. The id of the `resources`
+  table will map to the resource_id of the `rdatapaths` table.
+  
+
+#### location_prefixes
+
+Provides location metadata used to construct or interpret resource storage paths.
+
+This is primarily used internally to resolve where a resource is located within
+a remote or local storage system.
+
+The `resources` table location_prefix_id maps to an id of this table.
+
+
+#### input_sources
+
+Contains provenance information describing the original source of each resource.
+
+This includes:
+
+  - source URLs
+  - version information
+  - checksums (MD5)
+  - last modified dates
+  - file sizes and source types
+
+This table is useful for tracking data origin. The id of the `resources` table
+will map to the resource_id of this table.
+
+#### statuses
+
+Defines lifecycle status information for each resource. Typical values indicate
+whether a resource is active, deprecated, or removed. The `resources` table
+status_id maps to the id of this table.
+
+#### tags
+
+Associates free-form tags with resources to support categorisation and search.
+Each tag is linked to a resource_id that maps back to the `resources` table id.
+
+#### Other (non exposed)
+
+The underlying SQLite schema also contains additional tables used for internal
+bookkeeping: biocversions, recipes, schema_info, and timestamp. These tables are not
+currently exposed through BiocHubQuery, as they primarily support internal
+versioning and infrastructure concerns rather than user-facing queries.
+
+If access to these tables becomes necessary for advanced use cases, they may be
+exposed upon request.
+
+## Recommended Additional Views 
+
+To simplify common analytical workflows, BiocHubQuery also provides pre-computed
+views. These are derived from joins across multiple tables and are generally
+recommended over working with the above listed raw tables. They include:
+resource_metadata, resource_downloadlinks, and resource_full.
+
+
+#### resource_metadata
+
+A denormalized view combining core resources table information with:
+
+  - status labels
+  - location prefix metadata
+  - aggregated R data class information
+
+This view provides a convenient “one-row-per-resource” summary.
+
+#### resource_downloadlinks
+
+Provides resolved download paths for each resource.
+
+This includes:
+
+  - resource identifiers
+  - resolved file paths
+  - status information
+  - constructed full storage paths
+
+Useful for programmatic download workflows.
+
+#### resource_full
+
+A comprehensive joined view combining metadata and download information.
+
+This view is intended as the primary entry point for most users, providing:
+
+  - full resource metadata
+  - file-level download information
+  - associated R data class mappings
+
+It is designed to support efficient filtering and querying without requiring
+manual joins across multiple tables.
+
+# Retrieving Data
+
+Example query
+
+# SessionInfo
+
+```{r, sessioninfo}
+sessionInfo()
+```
