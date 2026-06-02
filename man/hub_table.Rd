@@ -2,7 +2,8 @@
 % Please edit documentation in R/hubs.R
 \name{hub_table}
 \alias{hub_table}
-\title{Retrieve a remotely read parquet file of Bioconductor AnnotationHub or ExperimentHub sqlite table}
+\title{Retrieve a remotely read parquet file of Bioconductor AnnotationHub or
+ExperimentHub sqlite table}
 \usage{
 hub_table(
   hub = c("annotationhub", "experimenthub"),

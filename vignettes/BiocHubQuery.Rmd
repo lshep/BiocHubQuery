@@ -12,7 +12,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r, vignette_setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -96,7 +96,8 @@ Key fields include metadata such as:
 
 #### rdatapaths
 
-Defines one or more R data object representations/files associated with each resource.
+Defines one or more R data object representations/files associated with each
+resource.
 
 This table includes:
 
@@ -117,7 +118,8 @@ url of a file.
 
 #### location_prefixes
 
-Provides location metadata used to construct or interpret resource storage paths.
+Provides location metadata used to construct or interpret resource storage
+paths.
 
 This is primarily used internally to resolve where a resource is located within
 a remote or local storage system.
@@ -154,8 +156,8 @@ Each tag is linked to a resource_id that maps back to the `resources` table id.
 #### Other (non exposed)
 
 The underlying SQLite schema also contains additional tables used for internal
-bookkeeping: biocversions, recipes, schema_info, and timestamp. These tables are not
-currently exposed through BiocHubQuery, as they primarily support internal
+bookkeeping: biocversions, recipes, schema_info, and timestamp. These tables are
+not currently exposed through BiocHubQuery, as they primarily support internal
 versioning and infrastructure concerns rather than user-facing queries.
 
 If access to these tables becomes necessary for advanced use cases, they may be

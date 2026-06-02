@@ -20,7 +20,9 @@
                              endpoint_override = "https://mghp.osn.xsede.org"
                          )
     ## https://bir190004-bucket01.mghp.osn.xsede.org/index.html#ExperimentHub/ExperimentHub/parquet/
-    file_path <- paste0("bir190004-bucket01/", hub, "/", hub, "/", "parquet/", tblname, ".parquet")
+    file_path <- paste0("bir190004-bucket01/",
+                        hub, "/", hub, "/", "parquet/",
+                        tblname, ".parquet")
     url <- s3fs$OpenInputFile(file_path)
     return(url)
 }

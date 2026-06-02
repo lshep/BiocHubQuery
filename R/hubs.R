@@ -1,7 +1,8 @@
 #'
 #' @import arrow
 #' 
-#' @title Retrieve a remotely read parquet file of Bioconductor AnnotationHub or ExperimentHub sqlite table
+#' @title Retrieve a remotely read parquet file of Bioconductor AnnotationHub or
+#' ExperimentHub sqlite table
 #'
 #' @description Traditionally using the AnnotationHub or ExperimentHub
 #' Bioconductor packages required downloaded an ever-increasing SQLite file 
